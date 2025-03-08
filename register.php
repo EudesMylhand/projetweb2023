@@ -7,6 +7,13 @@ if (isset($_POST['inscription'])) {
 
     require_once('./include/bdd.php');
 
+    $nom = trim($_POST['nom']);   
+    $prenom = trim($_POST['prenom']); 
+    $username = trim($_POST['username']); 
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+
+
     // Verification des champs
     if (empty($_POST['nom']) || !preg_match("/^[\p{L}\s'-]+$/u", $_POST['nom'])) {
         $message = "Le nom ne doit contenir que des lettres.";
@@ -125,10 +132,11 @@ if (isset($_POST['inscription'])) {
                 // echo '===========Après upload===============';
 
                 // echo '</pre>';
-                
+
         // Hashage du mot de passe
-        // $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $password_hash = ($_POST['password']);
+        $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+        // $password_hash = ($_POST['password']);
 
 
         // Gestion des doubles usernames

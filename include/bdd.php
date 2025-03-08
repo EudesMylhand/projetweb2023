@@ -1,5 +1,5 @@
 <?php
-$dsn = 'mysql:dbname=horizon;host=localhost';
+$dsn = 'mysql:dbname=horizon;host=localhost; charset=utf8';
 $user = 'root';
 $password = '';
 

@@ -1,9 +1,14 @@
-<?php
+<?php require_once('./include/bdd.php'); ?>
 
+<?php
+ob_start(); // Active la mise en mémoire tampon
 session_start();
 if (isset($_POST['connexion'])) {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    // Vérifiez les données POST
+    var_dump($_POST);
+
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
     if (empty($email)) {
         die("Erreur : Le champ email est vide.");
@@ -12,18 +17,25 @@ if (isset($_POST['connexion'])) {
         die("Erreur : Le champ mot de passe est vide.");
     }
 
-    require_once('./include/bdd.php'); 
+    
+    var_dump($password); // Vérifiez si $password est modifié après l'inclusion
 
     // Vérification de l'utilisateur
     $requete = $bdd->prepare('SELECT * FROM horizon.utlisateur WHERE email_utilisateur = :email');
     $requete->execute([':email' => $email]);
     $resultat = $requete->fetch();
 
+    var_dump($resultat);
+    var_dump($password); // Vérifiez si $password est modifié aprés l'inclusion
+
     if (!$resultat) {
         $message = "Merci de saisir une adresse email valide.";
     } elseif ($resultat['validation_email_utilisateur'] == 0) {
 
-        require_once "./include/token.php"; 
+        require_once "./include/token.php";
+        var_dump($resultat);
+
+        var_dump($password); // Vérifiez si $password est modifié après l'inclusion
 
         // Mise à jour du token
         $update = $bdd->prepare('UPDATE horizon.utlisateur SET token_utilisateur = :token WHERE email_utilisateur = :email');
@@ -33,51 +45,31 @@ if (isset($_POST['connexion'])) {
         ]);
 
         require_once ('./include/envoimail/sendmail.php');
+        var_dump($password); // Vérifiez si $password est modifié après l'inclusion
+        var_dump($resultat);
     } else {
-     
-        
-        $passwordIsOk = password_verify($password, $resultat['password_utilisateur']);
-        if (!$passwordIsOk) {
-            echo "mot de passe clair different de celui hash.";
-            $message = "mot de passe clair different de celui hash.";
-        }
-
-        var_dump ($_POST);
-        var_dump($password, $resultat['password_utilisateur'], password_verify($password, $resultat['password_utilisateur']));
-
-        if ($passwordIsOk) {
+        // Débogage
+        echo "Mot de passe saisi : " . $password . "<br>";
+        echo "Mot de passe haché dans la BDD : " . $resultat['password_utilisateur'] . "<br>";
+        echo "Résultat de password_verify : " . (password_verify($password, $resultat['password_utilisateur']) ? 'true' : 'false') . "<br>";
+        var_dump($resultat);
+        if (password_verify($password, $resultat['password_utilisateur'])) {
+            // L'utilisateur est authentifié
             $_SESSION['id_utilisateur'] = $resultat['id_utilisateur'];
             $_SESSION['username'] = $resultat["username"];
-            $_SESSION['email_utilisateur'] = $resultat["email_utilisateur"]; //$resultat["email_utilisateur"]
+            $_SESSION['email_utilisateur'] = $resultat["email_utilisateur"];
             $_SESSION['role_utilisateur'] = $resultat["role_utilisateur"];
-      
-            header('Location:index.php');
-            var_dump ($_POST);
-            var_dump($password, $resultat['password_utilisateur'], password_verify($password, $resultat['password_utilisateur']));
 
+            header('Location: index.php');
             exit();
         } else {
             $message = "Veuillez saisir un mot de passe valide.";
         }
     }
+    // cette ligne à la fin du fichier pour vider le tampon :
+    ob_end_flush(); // Envoie le contenu du tampon au navigateur
 }
 require_once ('./include/header_login.php');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // ============CODE PHP 2023 =========================
@@ -119,9 +111,6 @@ require_once ('./include/header_login.php');
 //         }
 
 //     }
-
-
-
 
 
 
