@@ -178,7 +178,7 @@ if (isset($_POST['inscription'])) {
             $requete->bindValue(':photo', $photo_profil, PDO::PARAM_STR);
 
             if ($requete->execute()) {
-                $success = "Inscription réussie !";
+                $success = "Inscription réussie un email de confirmation vous a été envoyé !";
             } else {
                 $message = "Erreur lors de l'inscription.";
             }
