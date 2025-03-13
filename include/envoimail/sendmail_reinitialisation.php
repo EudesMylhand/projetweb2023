@@ -37,7 +37,7 @@
      if (empty($_POST['email'])) {
          die("Erreur : L'email du destinataire est vide.");
      }
- 
+     //Vérification de email et nom
      $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
      $nom   = $_POST['nom'] ?? 'Utilisateur';
  
@@ -55,11 +55,11 @@
  
      // 📌 Contenu du mail
      $mail->isHTML(true);
-     $mail->Subject = 'Confirmation d\'email';
+     $mail->Subject = 'Réinitialisation du mot de passe';
      $mail->Body = '
-         Merci de vous être inscrit sur notre site. <br>
+         Afin de réinitialiser votre mot de passe. <br>
          Veuillez cliquer sur le lien suivant pour activer votre compte : <br>
-         <a href="http://localhost/projetWeb/verification.php?token='.$token.'&email='.urlencode($email).'">Confirmation email</a>
+         <a href="http://localhost/projetWeb/newpassword.php?token='.$token.'&email='.urlencode($email).'">réinitialisation de mot de passe</a>
      ';
  
      // 📌 Envoi du mail

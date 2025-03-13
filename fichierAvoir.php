@@ -124,6 +124,42 @@ if (isset($_POST['inscription'])) {
 
        
     }
+
 }
+
+// ================Reinitialisation du mot de passe========================
+if (isset($_POST['forget_password'])) {
+
+    if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $message = "Merci de saisir une adresse email.";
+    }else{
+        require_once('./include/bdd.php');
+        $email = trim($_POST['email']);    
+    $requete = $bdd->prepare('SELECT * FROM horizon.utlisateur WHERE email_utilisateur = :email');
+    $requete->bindValue(':email', $_POST['email'], PDO::PARAM_STR);
+    $requete->execute(array(':email' => $email));
+    $resultat = $requete->fetch();
+    if ($resultat) {
+        $token = bin2hex(random_bytes(50));
+        $requete = $bdd->prepare('UPDATE horizon.utlisateur SET token = :token WHERE email_utilisateur = :email');
+        $requete->execute(array(':token' => $token, ':email' => $email));
+        $requete = $bdd->prepare('SELECT * FROM horizon.utlisateur WHERE email_utilisateur = :email');
+        $requete->execute(array(':email' => $email));
+        $resultat = $requete->fetch();
+        $id = $resultat['id_utilisateur'];
+        $token = $resultat['token'];
+        $to = $email;
+        $subject = "Reinitialisation du mot de passe";
+        $message = "Merci de cliquer sur le lien suivant pour reinitialiser votre mot de passe : ";
+        $message .= "<a href='http://localhost/Projet_Web/password_reset.php?id=$id&token=$token'>Reinitialiser le mot de passe</a>";
+        mail($to, $subject, $message);
+        header('Location: login.php');
+    } else {
+        $message = "Email introuvable";
+    }
+    }
+    
+}
+
 ?>
-      
+   

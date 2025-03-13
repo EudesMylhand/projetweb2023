@@ -40,7 +40,7 @@ if (isset($_POST['connexion'])) {
 
     if (!$resultat) {
         $message = "Merci de saisir une adresse email valide.";
-    } elseif ($resultat['validation_email_utilisateur'] == 0) {
+    } elseif ($resultat['validation_email_utilisateur'] != 1) {
 
         require_once "./include/token.php";
         // var_dump($resultat);
