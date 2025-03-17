@@ -4,6 +4,9 @@ require_once('include/header_password.php');
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+var_dump($_POST);
+
+
 
 if (isset($_POST['forget_password'])) {
     
@@ -26,9 +29,9 @@ if (isset($_POST['forget_password'])) {
         } else {
             
             // Si l'email n'est pas encore validé
-            if ($resultat['validation_email_utilisateur'] == 0) {
+            if ($resultat['validation_email_utilisateur'] != 0) {
                 require_once "include/token.php"; // Génération d'un token sécurisé
-
+                var_dump($resultat);
                 // Mise à jour du token dans la base de données
                 $update = $bdd->prepare('UPDATE horizon.utlisateur SET token_utilisateur=:token WHERE email_utilisateur=:email');
                 $update->bindValue(':token', $token);

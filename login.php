@@ -21,10 +21,10 @@ if (isset($_POST['connexion'])) {
     $password = trim($_POST['password']);
 
     if (empty($email)) {
-        die("Erreur : Le champ email est vide.");
+        $message = ("Erreur : Le champ email est vide.");
     }
     if (empty($password)) {
-        die("Erreur : Le champ mot de passe est vide.");
+        $message = ("Erreur : Le champ mot de passe est vide.");
     }
 
     
@@ -178,16 +178,16 @@ require_once ('./include/header_login.php');
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header">
                                         <?php if (isset($message)) : ?>
-                                            <p class="text-center text-danger" >
+                                            <div class="text-center text-danger" >
                                                 <?php echo $message ?>
-                                            </p>
+                                            </div>
                                         </div>
                                         <?php endif ?>
                                         <h3 class="text-center font-weight-light my-4">connexion</h3></div>
                                     <div class="card-body">
                                         <form action="login.php" method="post">
                                             <div class="form-floating mb-3">
-                                                <input class="form-control" name="email" value="<?php if (isset($_COOKIE['email'])) echo $_COOKIE['email']; ?>" id="inputEmail" type="email" placeholder="name@example.com" />
+                                                <input class="form-control" name="email" value="<?php if (isset($_COOKIE['email'])) echo $_COOKIE['email']; ?>" id="inputEmail" type="email" placeholder="name@example.com" required />
                                                 <label for="inputEmail">Email adresse</label>
                                             </div>
                                             <div class="form-floating mb-3">

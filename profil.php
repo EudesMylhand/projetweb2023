@@ -3,53 +3,125 @@ session_start();
 require_once 'include/bdd.php';
 require_once 'include/header_login.php';
 
-if ($_SESSION['id_utilisateur']) {
-
-//Requete preparee
-    // $id_utilisateur = $_SESSION['id_utilisateur'];
-    // $requete = $bdd->prepare('SELECT * FROM horizon.utlisateur WHERE id_utilisateur = :id_utilisateur');
-    // $requete->bindValue(':id_utilisateur', $id_utilisateur);
-    // $requete->execute();
-    // $resultat = $requete->fetch();
-
-// Requete simple Autre syntaxe
+// Vérifier si l'utilisateur est connecté
+if (isset($_SESSION['id_utilisateur'])) {
+    // Récupérer l'ID de l'utilisateur depuis la session
     $id_utilisateur = $_SESSION['id_utilisateur'];
-    $requete = "SELECT * FROM horizon.utlisateur WHERE id_utilisateur = $id_utilisateur";
-    $result = $bdd->query($requete);
 
-    $ligne = $result->fetch(PDO::FETCH_ASSOC);
+    // Requête préparée pour récupérer les informations de l'utilisateur
+    try {
+        $requete = $bdd->prepare('SELECT * FROM horizon.utlisateur WHERE id_utilisateur = :id_utilisateur');
+        $requete->bindValue(':id_utilisateur', $id_utilisateur, PDO::PARAM_INT);
 
-    $photo_profil = $ligne['photo_utilisateur'];
-    $nom = $ligne['nom_utilisateur'];
-    $prenom = $ligne['prenom_utilisateur'];
-    $email = $ligne['email_utilisateur'];
-    $username = $ligne['username'];
-    $password = $ligne['password_utilisateur'];
-    $role = $ligne['role_utilisateur'];
+        $requete->execute();
+        $ligne = $requete->fetch(PDO::FETCH_ASSOC);
 
+        // Vérifier si l'utilisateur existe dans la base de données
+        if ($ligne) {
+            $photo_profil = $ligne['photo_utilisateur'] ?? '';
+            $nom_utilisateur = $ligne['nom_utilisateur'] ?? '';
+            $prenom_utilisateur = $ligne['prenom_utilisateur'] ?? '';
+            $email_utilisateur = $ligne['email_utilisateur'] ?? '';
+            $username = $ligne['username'] ?? '';
+       
+            // Afficher ou utiliser les informations de l'utilisateur
+        } else {
+            echo "Utilisateur non trouvé dans la base de données.";
+            exit;
+        }
+    } catch (PDOException $e) {
+        echo "Erreur de base de données : " . $e->getMessage();
+        exit;
+    }
+} else {
+    // Utilisateur non connecté, afficher une alerte et rediriger
 
-
-}else{
-
-echo "script type=\"text/javascript\">
-    alert('l'utilisateur n'est pas connecté.');
-    document.location='login.php';
-    </script>";
-
-    // echo "Vous n'êtes pas connecté";
-    // echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-    // echo "<script>
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     Swal.fire({
-    //         title: 'Vous êtes déconnecté',
-    //         text: 'Appuyer sur Ok pour retourner sur la page de connexion.',
-    //         icon: 'warning',
-    //         confirmButtonText: 'OK'
-    //     }).then(() => {
-    //         window.location.href = 'login.php';
-    //     });
-    // });
+    // echo "<script type=\"text/javascript\">
+    //     alert('L\\'utilisateur n\\'est pas connecté.');
+    //     window.location.href = 'login.php';
     // </script>";
-}
 
+ // Utilisateur non connecté, afficher une alerte SweetAlert2 et rediriger
+ echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+ echo "<script>
+     document.addEventListener('DOMContentLoaded', function() {
+         Swal.fire({
+             title: 'Pour acceder au profil, vous devez vous connecter',
+             text: 'Appuyer sur Ok pour retourner sur la page de connexion.',
+             icon: 'warning',
+             confirmButtonText: 'OK'
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 window.location.href = 'login.php';
+             }
+         });
+     });
+ </script>";
+
+    exit(); // Arrêter l'exécution du script
+}
 ?>
+
+
+
+<body class="bg-primary">
+        <div id="layoutAuthentication">
+            <div id="layoutAuthentication_content">
+                <main>
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-5">
+                                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                    <div class="card-header">
+                                        <?php if (isset($message)) echo "<p class='text-center text-danger' >$message</p>" ?>
+                                    </div>
+                                    <h3 class="text-center font-weight-light my-4">Profil</h3>
+
+                                    <div class="card-header">
+                                    <!-- SYNTAXE 1 -->
+                                    <!-- Image de profil -->
+                                     <?php if (isset($photo_profil)) echo "<center>
+                                     <img src='img/photo_profil/$photo_profil' class='media-object'
+                                      width='150' height='200' alt='Image de profil' />
+                                     </center>" ?>
+
+                                    <!-- SYNTAXE 2 -->
+                                    <!-- Image de profil -->
+                                        <!-- <?php if (!empty($photo_profil)): ?>
+                                            <img src="img/photo_profil/<?php echo htmlspecialchars($photo_profil); ?>" 
+                                            width="150" height="200" alt="Image de profil" />
+                                        <?php endif; ?> -->
+                                    </div>
+
+                                    <div class="card-body">
+
+                                            <p><?php if(isset($id_utilisateur)) echo "ID :  $id_utilisateur" ?></p>
+                                            <p><?php if(isset($nom_utilisateur)) echo "Nom :  $nom_utilisateur"?></p>
+                                            <p><?php if(isset($prenom_utilisateur)) echo "Prénom :  $prenom_utilisateur"?></p>
+                                            <p><?php if(isset($email_utilisateur)) echo "Email : $email_utilisateur"?></p>
+                                            <p><?php if(isset($username)) echo "Username : $username" ?></p>
+
+                                            <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                              <?php
+                                                  if (isset($id_utilisateur)){
+                                                    echo "<a class='small btn btn-danger'
+                                                    href='profil.php?supprimer_compte=$id_utilisateur'>Supprimer mon compte</a>";
+
+                                                    echo "<a class='small btn btn-warning'
+                                                    href='profil.php?modifier_compte=$id_utilisateur'>Modifiier mon compte</a>";
+                                                  }
+                                              ?>
+                                                <!-- <input type="submit" value="connecter" name="connexion" class="btn btn-primary"> -->
+                                            </div>
+                        
+                                    </div>
+                                    <div class="card-footer text-center py-3">
+                                        <!-- <div class="small"><a href="register.php">Avez-vous un compte? Enregistrer-vous!</a></div> -->
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>

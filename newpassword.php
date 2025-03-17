@@ -49,21 +49,38 @@ if ((isset($_GET['email']) && !empty($_GET['email'])) &&
                 // Vérifiez si la mise à jour a réussi
                 if ($requete->rowCount() == 1) {
 
-                    // echo "script type=\"text/javascript\">
+
+                    // echo "<script type=\"text/javascript\">
                     // alert('Votre mot de passe a bien été réinitialisé.');
-                    // window.location='login.php';
+                    // window.location.href = 'login.php';
                     // </script>";
 
-                    echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
-                    echo '<script>
+                    // echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+                    // echo '<script>
+                    //         Swal.fire({
+                    //             title: "Succès !",
+                    //             text: "Votre mot de passe a bien été réinitialisé.",
+                    //             icon: "success"
+                    //         }).then(() => {
+                    //             window.location.href = "login.php"; 
+                    //         });
+                    //       </script>';
+
+                    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
+                    echo "<script>
+                        document.addEventListener('DOMContentLoaded', function() {
                             Swal.fire({
-                                title: "Succès !",
-                                text: "Votre mot de passe a bien été réinitialisé.",
-                                icon: "success"
-                            }).then(() => {
-                                window.location.href = "login.php"; // Redirection vers la page de connexion
+                                title: 'Votre mot de passe a bien été réinitialisé',
+                                text: 'Appuyer sur Ok pour retourner sur la page de connexion.',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'login.php'; // Redirection vers la page de connexion
+                                }
                             });
-                          </script>';
+                        });
+                    </script>";
                 } else {
                     header('Location: password.php');
                     exit();
