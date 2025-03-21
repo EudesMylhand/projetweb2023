@@ -29,7 +29,7 @@ if (isset($_POST['forget_password'])) {
         } else {
             
             // Si l'email n'est pas encore validé
-            if ($resultat['validation_email_utilisateur'] != 0) {
+            if ($resultat['validation_email_utilisateur'] == 0) {
                 require_once "include/token.php"; // Génération d'un token sécurisé
                 var_dump($resultat);
                 // Mise à jour du token dans la base de données
